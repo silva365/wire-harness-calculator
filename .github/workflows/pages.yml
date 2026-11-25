@@ -15,13 +15,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # The page loads the Python package and example from the repo layout,
       # so publish the same layout and redirect the site root to web/.
       - name: Build site
@@ -30,7 +27,25 @@ jobs:
           cp -r web harnesscalc examples _site/
           find _site -name '__pycache__' -prune -exec rm -rf {} +
           printf '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=web/"><a href="web/">harnesscalc</a>\n' > _site/index.html
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+
+  # Separate from build because a new artifact can take a while to become
+  # visible (actions/deploy-pages#451). If the first try can't deploy, wait and
+  # try once more. "Re-run failed jobs" is also safe with this layout.
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url || steps.retry.outputs.page_url }}
+    steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        continue-on-error: true
+        uses: actions/deploy-pages@v5
+      - name: Wait before retrying
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 60
+      - id: retry
+        if: steps.deployment.outcome == 'failure'
+        uses: actions/deploy-pages@v5
