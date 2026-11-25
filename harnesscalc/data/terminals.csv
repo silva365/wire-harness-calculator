@@ -1,0 +1,6 @@
+part_number,description,wire_range_awg,source
+EX-SKT-22,Example sealed socket - sensor size,20-22,Example only: replace with manufacturer datasheet values
+EX-SKT-16,Example sealed socket - standard,16-20,Example only: replace with manufacturer datasheet values
+EX-SKT-12,Example sealed socket - power,12-14,Example only: replace with manufacturer datasheet values
+EX-RING-14,Example ring terminal M6,14-16,Example only: replace with manufacturer datasheet values
+EX-RING-10,Example ring terminal M8,10-12,Example only: replace with manufacturer datasheet values

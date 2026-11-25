@@ -1,0 +1,27 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - run: pytest -q
+      # Size every BOM in examples/ and publish the reports. The example has a
+      # part flagged on purpose, so a non-zero exit is allowed here; for a real
+      # harness, drop "|| true" so a part that needs attention fails the build.
+      - name: Size example BOMs
+        run: |
+          for bom in examples/*.csv; do
+            harnesscalc "$bom" -o reports || true
+          done
+          cat reports/*_gauges.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: harness-reports
+          path: reports/

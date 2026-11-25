@@ -1,0 +1,8 @@
+part,current_a,length_mm,terminals
+Headlamp left,4.6,3000,EX-SKT-16
+Headlamp right,4.6,3100,EX-SKT-16
+Horn,8,2500,EX-RING-14
+Fuel pump,10,4000,EX-SKT-16
+Coolant temp sensor,0.01,2000,EX-SKT-22
+Cooling fan,18,1500,EX-RING-10
+Dome light,0.8,2800,

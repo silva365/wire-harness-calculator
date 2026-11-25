@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>harnesscalc</title>
+  <meta name="description" content="Pick the right wire gauge for each part on a harness BOM.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M3 10h8c4 0 4 6 8 6h10M3 22h8c4 0 4-6 8-6h10' fill='none' stroke='%23b5562a' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
+        <path d="M3 10h8c4 0 4 6 8 6h10" class="w1"/>
+        <path d="M3 16h8c4 0 4 0 8 0h10" class="w2"/>
+        <path d="M3 22h8c4 0 4-6 8-6h10" class="w3"/>
+      </svg>
+      <div>
+        <h1>harnesscalc</h1>
+        <p>Wire gauge for every part on your BOM</p>
+      </div>
+    </div>
+    <span id="runtime" class="pill loading" role="status">Loading Python…</span>
+  </header>
+
+  <main class="layout">
+    <aside class="card settings" aria-labelledby="settings-title">
+      <h2 id="settings-title">Design limits</h2>
+      <form id="settings" onsubmit="return false"></form>
+      <button id="reset-settings" class="btn ghost" type="button" disabled>Reset to defaults</button>
+    </aside>
+
+    <section class="content">
+      <div class="card" id="editor-card">
+        <div class="card-head">
+          <div>
+            <h2>Parts</h2>
+            <p class="muted" id="bom-name">&nbsp;</p>
+          </div>
+          <div class="toolbar">
+            <label class="btn" id="import-btn" aria-disabled="true">
+              <input type="file" id="file" accept=".csv,text/csv" hidden disabled>Import BOM
+            </label>
+            <button class="btn" id="load-example" type="button" disabled>Load example</button>
+            <button class="btn" id="add-row" type="button" disabled>Add part</button>
+            <button class="btn" id="export-bom" type="button" disabled>Export BOM</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="editor" id="editor"></table>
+        </div>
+        <datalist id="terminal-list"></datalist>
+        <p class="hint">Length is the one-way run from the power source to the part. Separate several terminal part
+          numbers with <code>;</code>. Drop a CSV onto this card to import it.</p>
+        <div class="drop-overlay" aria-hidden="true">Drop BOM CSV to import</div>
+      </div>
+
+      <div class="card" id="results-card">
+        <div class="card-head">
+          <h2>Wire gauges</h2>
+          <div class="toolbar">
+            <button class="btn" data-dl="report_md" type="button" disabled>Report .md</button>
+            <button class="btn" data-dl="results_csv" type="button" disabled>Results .csv</button>
+          </div>
+        </div>
+        <div id="banner"><div class="banner info">Starting the Python runtime. This takes a few seconds the first time.</div></div>
+        <div id="results" class="table-wrap"></div>
+      </div>
+
+      <div class="card" id="catalog-card">
+        <div class="card-head">
+          <div>
+            <h2>Terminal catalog</h2>
+            <p class="muted" id="catalog-name">&nbsp;</p>
+          </div>
+          <div class="toolbar">
+            <label class="btn" id="catalog-import-btn" aria-disabled="true">
+              <input type="file" id="catalog-file" accept=".csv,text/csv" hidden disabled>Import catalog
+            </label>
+            <button class="btn" id="catalog-reset" type="button" disabled>Use example catalog</button>
+            <button class="btn" id="catalog-export" type="button" disabled>Export catalog</button>
+          </div>
+        </div>
+        <div id="catalog" class="table-wrap"></div>
+        <p class="hint">Columns: <code>part_number</code>, <code>wire_range_awg</code> (for example <code>14-16</code>),
+          and optionally <code>description</code>. Take the ranges from each terminal's datasheet.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Calculations run in your browser using the same Python package as the <code>harnesscalc</code> CLI.
+    Wire data are typical SAE J1128 TXL values: verify against your wire and terminal datasheets.
+  </footer>
+</body>
+</html>
